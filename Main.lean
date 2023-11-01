@@ -61,9 +61,34 @@ def getResponse (msgs : Array Message) : IO GPT.Message := do
   return msg
 
 elab "#find_with_gpt" s:str : command => do
+  unless '.' ∈ s.getString.toList do
+    return
   let query := s.getString
+  let sysPrompt : GPT.Message := {
+    role := .system
+    content := "You are an expert mathematician and user of the Lean4 interactive proof assistant.
+Your task is to translate the user's entry into a Lean4 type expression.
+
+Examples:
+
+Input:
+If $n$ is a natural number, then $n % 2 = 0$ or $n % 2 = 1$.
+Output:
+∀ (n : ℕ), n % 2 = 0 ∨ n % 2 = 1
+
+Input:
+If $G$ is a commutative group and $a,b ∈ G$, then $a * b = b * a$.
+Output:
+∀ (G : Type*) [CommGroup G] (a b : G), a * b = b * a
+"
+  }
+  let query : GPT.Message := {
+    role := .user
+    content := query
+  }
+  let res ← GPT.getResponse #[sysPrompt, query]
   let query : Json := .mkObj [
-    ("query", query),
+    ("query", res.content),
     ("results", 10)
   ]
   let res ← IO.Process.output {
@@ -90,3 +115,83 @@ elab "#find_with_gpt" s:str : command => do
     IO.println name
     IO.println type
     IO.println "---"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--
